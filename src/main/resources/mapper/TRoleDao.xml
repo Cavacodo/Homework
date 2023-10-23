@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.example.rbac.dao.TRoleDao">
+
+    <resultMap type="com.example.rbac.entity.TRole" id="TRoleMap">
+        <result property="rPermission" column="r_permission" jdbcType="INTEGER"/>
+        <result property="rRole" column="r_role" jdbcType="VARCHAR"/>
+    </resultMap>
+
+    <!--查询单个-->
+    <select id="queryById" resultMap="TRoleMap">
+        select
+          r_permission, r_role
+        from t_role
+        where r_permission = #{rPermission}
+    </select>
+
+    <!--查询指定行数据-->
+    <select id="queryAllByLimit" resultMap="TRoleMap">
+        select
+          r_permission, r_role
+        from t_role
+        <where>
+            <if test="rPermission != null">
+                and r_permission = #{rPermission}
+            </if>
+            <if test="rRole != null and rRole != ''">
+                and r_role = #{rRole}
+            </if>
+        </where>
+        limit #{pageable.offset}, #{pageable.pageSize}
+    </select>
+
+    <!--统计总行数-->
+    <select id="count" resultType="java.lang.Long">
+        select count(1)
+        from t_role
+        <where>
+            <if test="rPermission != null">
+                and r_permission = #{rPermission}
+            </if>
+            <if test="rRole != null and rRole != ''">
+                and r_role = #{rRole}
+            </if>
+        </where>
+    </select>
+
+    <!--新增所有列-->
+    <insert id="insert" keyProperty="rPermission" useGeneratedKeys="true">
+        insert into t_role(r_role)
+        values (#{rRole})
+    </insert>
+
+    <insert id="insertBatch" keyProperty="rPermission" useGeneratedKeys="true">
+        insert into t_role(r_role)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+        (#{entity.rRole})
+        </foreach>
+    </insert>
+
+    <insert id="insertOrUpdateBatch" keyProperty="rPermission" useGeneratedKeys="true">
+        insert into t_role(r_role)
+        values
+        <foreach collection="entities" item="entity" separator=",">
+            (#{entity.rRole})
+        </foreach>
+        on duplicate key update
+        r_role = values(r_role)
+    </insert>
+
+    <!--通过主键修改数据-->
+    <update id="update">
+        update t_role
+        <set>
+            <if test="rRole != null and rRole != ''">
+                r_role = #{rRole},
+            </if>
+        </set>
+        where r_permission = #{rPermission}
+    </update>
+
+    <!--通过主键删除-->
+    <delete id="deleteById">
+        delete from t_role where r_permission = #{rPermission}
+    </delete>
+
+    <select id="queryRole" resultType="java.lang.String">
+        select
+            r_role
+        from t_role
+        where r_permission = #{r_permission}
+    </select>
+
+</mapper>
+
